@@ -11,5 +11,12 @@ foreach ($events as $event) {
       !($event instanceof \LINE\LINEBot\Event\MessageEvent\TextMessage)) {
     continue;
   }
-  $bot->replyText($event->getReplyToken(), $event->getText());
+
+  if($event->getText() === "おはよう"){
+    $bot->replyText($event->getReplyToken(), "おはよう！さあ、今日も今日とて旅立ちますか！お仕事にね！(happy)");
+  }else if($event->getText() === "行ってきます"){
+    $bot->replyText($event->getReplyToke(), "いってらっしゃい！頑張ってねプロデューサー！(blush)");
+  }else{
+    $bot->replyText($event->getReplyToken(), $event->getText());
+  }
 }
