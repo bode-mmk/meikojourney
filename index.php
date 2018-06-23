@@ -15,7 +15,7 @@ foreach ($events as $event) {
   if($event->getText() === "おはよう"){
     $bot->replyText($event->getReplyToken(), "おはよう！さあ、今日も今日とて旅立ちますか！お仕事にね！");
   }elseif($event->getText() === "行ってきます"){
-    $bot->replyText($event->getReplyToke(), "いってらっしゃい！頑張ってねプロデューサー！");
+    $bot->replyText($event->getReplyToken(), "いってらっしゃい！頑張ってねプロデューサー！");
   }else{
     $bot->replyText($event->getReplyToken(), $event->getText());
   }
