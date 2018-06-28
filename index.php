@@ -13,6 +13,7 @@ $bot = new \LINE\LINEBot($httpClient, ['channelSecret' => getenv('CHANNEL_SECRET
 $sign = $_SERVER["HTTP_" . \LINE\LINEBot\Constant\HTTPHeader::LINE_SIGNATURE];
 $events = $bot->parseEventRequest(file_get_contents('php://input'), $sign);
 
+// エモーティコンの置換準備
 $raw_code = [
   '100001' => '100001',
   '100002' => '100002',
@@ -30,19 +31,34 @@ foreach($raw_code as $code){
   $emoticon[$code] = mb_convert_encoding($bin, 'UTF-8', 'UTF-32BE');
 }
 
+// 返答ファイルの読み込み
+$response_sentence = file("response_list");
+
+// error_log('message', 3, 'test.log');
+
 foreach ($events as $event) {
   if (!($event instanceof \LINE\LINEBot\Event\MessageEvent) ||
       !($event instanceof \LINE\LINEBot\Event\MessageEvent\TextMessage)) {
     continue;
   }
 
-  if($event->getText() === "おはよう"){
-    $bot->replyText($event->getReplyToken(), "おはよう！さあ、今日も今日とて旅立ちますか！お仕事にね！".$emoticon["100004"]);
-  }elseif($event->getText() === "行ってきます"){
-    $bot->replyText($event->getReplyToken(), "いってらっしゃい！頑張ってねプロデューサー！".$emoticon["100008"]);
-  }elseif($event->getText() === "おやすみ"){
-    $bot->replyText($event->getReplyToken(), "おやすみプロデューサー！今日も一日お疲れ様！".$emoticon["100007"]);
-  }else{
-    $bot->replyText($event->getReplyToken(), $event->getText());
+  // 返答リストから該当するものを返答する
+  foreach($response_sentence as $line){
+    // Pの発言,芽衣子さんの発言
+    $response = explode(",", trim($line));
+
+    if($event->getText() === $response[0]){
+      // 絵文字は置換する → (100007とか)
+      //$str = preg_replace('/\((\d{6})\)/', $emoticon['100004'], $response[1] ); みたいに本来はしたい……
+      $str = preg_replace_callback('/\((\d{6})\)/',
+        function($matches) use ($emoticon){
+          return $emoticon[$matches[1]];
+        },
+        $response[1]
+      );
+      $bot->replyText($event->getReplyToken(), $str);
+
+      break;
+    }
   }
 }
