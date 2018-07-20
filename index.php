@@ -41,4 +41,13 @@ foreach ($events as $event) {
       break;
     }
   }
+
+  // 取り敢えず
+  $mecab = new MeCab\Tagger();
+  $nodes = $mecab->parseToNode($event->getText());
+  $response_text = "";
+  foreach ($nodes as $n){
+    $response_text = $response_text . $n->getFeature();
+  }
+  $bot->replyText($event->getReplyToken(), $response_text);
 }
